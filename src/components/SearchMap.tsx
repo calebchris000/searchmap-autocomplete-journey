@@ -113,10 +113,10 @@ const SearchMap: React.FC = () => {
   return (
     <div className="relative h-screen w-full overflow-hidden">
       {/* Map Container */}
-      <div ref={mapContainerRef} className="map-container" />
+      <div ref={mapContainerRef} className="h-full w-full" />
       
       {/* Search Overlay */}
-      <div className="search-overlay">
+      <div className="absolute top-4 left-0 right-0 z-10 mx-auto px-4 max-w-xl">
         <SearchBar
           value={searchLocation}
           onChange={setSearchLocation}

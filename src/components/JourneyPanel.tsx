@@ -2,7 +2,7 @@
 import React, { useEffect } from "react";
 import { Location } from "@/utils/locationUtils";
 import LocationInput from "./LocationInput";
-import { ChevronDownIcon, ArrowLeftIcon, NavigationIcon } from "lucide-react";
+import { ArrowLeftIcon, NavigationIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface JourneyPanelProps {
@@ -31,7 +31,7 @@ const JourneyPanel: React.FC<JourneyPanelProps> = ({
   return (
     <div 
       className={`
-        w-full max-w-xl glass-panel rounded-xl overflow-hidden transition-all duration-500 ease-in-out
+        w-full max-w-xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-md p-3 rounded-xl shadow-lg overflow-hidden transition-all duration-500 ease-in-out
         ${isExpanded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-[-20px] pointer-events-none'}
       `}
     >

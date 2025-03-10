@@ -26,7 +26,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   return (
     <div
       className={`
-        w-full max-w-xl glass-panel rounded-xl overflow-hidden transition-all duration-500 ease-in-out
+        w-full max-w-xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-md p-3 rounded-xl shadow-lg overflow-hidden transition-all duration-500 ease-in-out
         ${isExpanded ? 'opacity-0 translate-y-[-20px] pointer-events-none' : 'opacity-100 translate-y-0'}
       `}
     >

@@ -75,12 +75,16 @@ export const searchLocations = (query: string): Location[] => {
   if (!query || query.trim() === "") return [];
   
   const normalizedQuery = query.toLowerCase().trim();
+  console.log("Searching for:", normalizedQuery);
   
-  return sampleLocations.filter(
+  const results = sampleLocations.filter(
     location => 
       location.name.toLowerCase().includes(normalizedQuery) || 
       location.fullAddress.toLowerCase().includes(normalizedQuery)
   );
+  
+  console.log("Found results:", results.length);
+  return results;
 };
 
 // Get location by ID

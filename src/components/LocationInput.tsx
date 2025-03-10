@@ -42,6 +42,7 @@ const LocationInput: React.FC<LocationInputProps> = ({
     // Search for locations
     const results = searchLocations(searchTerm);
     setSuggestions(results);
+    console.log("Search results:", results); // Add this to debug
   }, [searchTerm]);
   
   // Focus input on mount if autoFocus is true
@@ -91,7 +92,7 @@ const LocationInput: React.FC<LocationInputProps> = ({
         <input
           ref={inputRef}
           type="text"
-          className="location-input pr-10 pl-10"
+          className="w-full py-2 pl-10 pr-10 text-sm bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
           placeholder={placeholder}
           value={searchTerm}
           onChange={handleInputChange}
@@ -115,19 +116,19 @@ const LocationInput: React.FC<LocationInputProps> = ({
       </div>
       
       {isFocused && suggestions.length > 0 && (
-        <div className="absolute mt-1 w-full bg-white dark:bg-gray-900 shadow-xl rounded-xl overflow-hidden z-50 border border-gray-200/50 dark:border-gray-800/50 backdrop-blur-sm animate-fade-in">
-          <ul className="py-2 px-1 max-h-64 overflow-y-auto">
+        <div className="absolute z-50 mt-1 w-full bg-white dark:bg-gray-900 shadow-lg rounded-lg overflow-hidden border border-gray-200 dark:border-gray-800">
+          <ul className="max-h-60 overflow-y-auto py-1">
             {suggestions.map((location) => (
               <li key={location.id}>
                 <button
                   type="button"
-                  className="location-suggestion w-full text-left"
+                  className="flex items-center w-full px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                   onClick={() => handleSelectLocation(location)}
                 >
                   <MapPinIcon className="h-4 w-4 mr-2 text-primary flex-shrink-0" />
-                  <div>
-                    <div className="font-medium">{location.name}</div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400 truncate">{location.fullAddress}</div>
+                  <div className="flex flex-col items-start">
+                    <span className="font-medium">{location.name}</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400 truncate">{location.fullAddress}</span>
                   </div>
                 </button>
               </li>
