@@ -21,7 +21,7 @@ npm run dev
 ## Technology Stack
 
 - Frontend: React, TypeScript, Tailwind CSS
-- Backend: Node.js/Express, MongoDB
+- Backend: Node.js/Express
 
 ## Running Backend Only
 
