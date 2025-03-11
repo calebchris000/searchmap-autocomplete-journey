@@ -1,13 +1,15 @@
-
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { SearchIcon, XIcon, MapPinIcon } from "lucide-react";
 import { Location, searchLocations } from "@/utils/locationUtils";
+import { GetSearch } from "@/services/location.services";
+import { debounce } from "@/utils/inputUtiils";
 
 interface LocationInputProps {
   placeholder: string;
   value: Location | null;
   onChange: (location: Location | null) => void;
   onFocus?: () => void;
+  onValue?: (value: string) => void;
   disabled?: boolean;
   autoFocus?: boolean;
 }
@@ -17,66 +19,78 @@ const LocationInput: React.FC<LocationInputProps> = ({
   value,
   onChange,
   onFocus,
+  onValue,
   disabled = false,
   autoFocus = false,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchValue, setSearchValue] = useState("");
   const [suggestions, setSuggestions] = useState<Location[]>([]);
+  const [locations, setLocations] = useState<Location[]>([]);
+  const [locationLoaded, setLocationLoaded] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  
-  // Update searchTerm when value changes externally
+  const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    async function getSuggestions() {
+      setLocationLoaded(false);
+      if (!searchValue.length) return;
+      const response = await GetSearch(searchValue);
+      if (response.success) {
+        console.log(response.data);
+        setLocations(response.data as Location[]);
+        setLocationLoaded(true);
+      }
+    }
+    getSuggestions();
+  }, [searchValue]);
+
   useEffect(() => {
     if (value) {
       setSearchTerm(value.name);
     }
   }, [value]);
-  
-  // Handle search term changes
-  useEffect(() => {
-    if (searchTerm.trim() === "") {
-      setSuggestions([]);
-      return;
-    }
-    
-    // Search for locations
-    const results = searchLocations(searchTerm);
-    setSuggestions(results);
-    console.log("Search results:", results); // Add this to debug
-  }, [searchTerm]);
-  
-  // Focus input on mount if autoFocus is true
+
   useEffect(() => {
     if (autoFocus && inputRef.current) {
       inputRef.current.focus();
     }
   }, [autoFocus]);
-  
+
+  const debouncer = useCallback(
+    debounce((v: string) => {
+      onValue(v);
+      setSearchValue(v);
+    }),
+    [],
+  );
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
+    debouncer(e.target.value);
     if (e.target.value === "" && value) {
       onChange(null);
     }
   };
-  
+
   const handleFocus = () => {
     setIsFocused(true);
     if (onFocus) onFocus();
   };
-  
+
   const handleBlur = () => {
-    // Delay blur to allow click on suggestion
     setTimeout(() => {
       setIsFocused(false);
     }, 200);
   };
-  
+
   const handleSelectLocation = (location: Location) => {
     setSearchTerm(location.name);
     setSuggestions([]);
     onChange(location);
   };
-  
+
   const clearInput = () => {
     setSearchTerm("");
     setSuggestions([]);
@@ -85,7 +99,7 @@ const LocationInput: React.FC<LocationInputProps> = ({
       inputRef.current.focus();
     }
   };
-  
+
   return (
     <div className="relative w-full">
       <div className="relative">
@@ -114,11 +128,22 @@ const LocationInput: React.FC<LocationInputProps> = ({
           </button>
         )}
       </div>
-      
-      {isFocused && suggestions.length > 0 && (
+
+      {isFocused && !locationLoaded && searchValue && (
+        <div className="absolute z-50 mt-1 w-full bg-white dark:bg-gray-900 shadow-lg rounded-lg overflow-hidden border border-gray-200 dark:border-gray-800">
+          <div className="flex items-center justify-center py-4">
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
+            <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">
+              Searching...
+            </span>
+          </div>
+        </div>
+      )}
+
+      {isFocused && locationLoaded && (
         <div className="absolute z-50 mt-1 w-full bg-white dark:bg-gray-900 shadow-lg rounded-lg overflow-hidden border border-gray-200 dark:border-gray-800">
           <ul className="max-h-60 overflow-y-auto py-1">
-            {suggestions.map((location) => (
+            {locations.map((location) => (
               <li key={location.id}>
                 <button
                   type="button"
@@ -128,7 +153,9 @@ const LocationInput: React.FC<LocationInputProps> = ({
                   <MapPinIcon className="h-4 w-4 mr-2 text-primary flex-shrink-0" />
                   <div className="flex flex-col items-start">
                     <span className="font-medium">{location.name}</span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400 truncate">{location.fullAddress}</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                      {location.fullAddress}
+                    </span>
                   </div>
                 </button>
               </li>
